@@ -32,9 +32,9 @@ export class BookController {
   constructor(private readonly bookService: BookService) {}
 
   // @SkipThrottle()
-  @Throttle({ default: { limit: 2, ttl: 2000 } })
+  @Throttle({ default: { limit: 10, ttl: 2000 } })
   @Get()
-  @Roles(Role.Moderator, Role.Admin)
+  @Roles(Role.Moderator, Role.Admin, Role.User)
   @UseGuards(AuthGuard(), RolesGuard)
   async getAllBooks(@Query() query: ExpressQuery): Promise<Book[]> {
     return this.bookService.findAll(query);
@@ -47,15 +47,12 @@ export class BookController {
     book: CreateBookDto,
     @Req() req,
   ): Promise<Book> {
-    console.log(req.user);
-
     return this.bookService.create(book, req.user);
   }
 
   @Get('new')
   async getNewBooks(): Promise<Book[]> {
     const books = await this.bookService.findNewBooks();
-    console.log(books);
     return books;
   }
 
